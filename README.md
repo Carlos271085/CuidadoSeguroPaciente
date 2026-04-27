@@ -1,123 +1,116 @@
-#  Microservicio de Pacientes - Cuidado Seguro
+🏥 Microservicio de Pacientes - Cuidado Seguro
+📌 Descripción
 
-##  Descripción
+El microservicio de pacientes forma parte del sistema Cuidado Seguro, y tiene como objetivo gestionar la información clínica de los pacientes, permitiendo realizar operaciones CRUD (Crear, Leer, Actualizar y Eliminar).
 
-El microservicio de pacientes forma parte del sistema **Cuidado Seguro**, y tiene como objetivo gestionar la información de los pacientes, permitiendo realizar operaciones como registro, consulta, actualización y eliminación de datos clínicos.
+Este servicio está diseñado bajo una arquitectura de microservicios, permitiendo su integración con otros servicios del sistema, como el microservicio de autenticación.
 
-Este microservicio está diseñado bajo una arquitectura de microservicios, permitiendo su integración con otros servicios como el microservicio de autenticación.
+🛠️ Tecnologías utilizadas
+Java 17
+Spring Boot 3
+Spring Web
+Spring Data JPA
+H2 Database (en memoria)
+Maven
+Lombok
+Jakarta Validation
+Docker
+Resilience4j (Circuit Breaker)
+Springdoc OpenAPI (Swagger)
+🧱 Arquitectura del Proyecto
 
+El proyecto sigue una arquitectura en capas:
 
-##  Tecnologías utilizadas
-
-- Java 17
-- Spring Boot
-- Spring Web
-- Spring Data JPA
-- H2 Database (base de datos en memoria)
-- Maven
-- Lombok
-- Jakarta Validation
-
----
-
-##  Arquitectura del Proyecto
-
-El proyecto sigue una **arquitectura en capas**, separando responsabilidades para mejorar la mantenibilidad y escalabilidad.
-
-controller → Manejo de endpoints REST
-service → Lógica de negocio
-repository → Acceso a datos (JPA)
-model → Entidades del sistema
-exception → Manejo global de errores
-
-
-##  Estructura del proyecto
+Controller → Manejo de endpoints REST
+Service → Lógica de negocio
+Repository → Acceso a datos (JPA)
+Model → Entidades del sistema
+Exception → Manejo global de errores
+📁 Estructura del proyecto
 com.pacientes.pacientes
 │
 ├── controller
-│ └── PacienteController.java
+│   └── PacienteController.java
 │
 ├── service
-│ └── PacienteService.java
+│   └── PacienteService.java
 │
 ├── repository
-│ └── PacienteRepository.java
+│   └── PacienteRepository.java
 │
 ├── model
-│ └── Paciente.java
+│   └── Paciente.java
 │
 ├── exception
-│ └── GlobalExceptionHandler.java
+│   └── GlobalExceptionHandler.java
 │
 └── PacientesApplication.java
-
-
-## Funcionalidades principales (CRUD)
-
-El microservicio permite las siguientes operaciones:
-
-| Método | Endpoint              | Descripción              |
-|--------|----------------------|--------------------------|
-| GET    | /pacientes           | Listar pacientes         |
-| GET    | /pacientes/{id}      | Obtener paciente por ID  |
-| POST   | /pacientes           | Crear paciente           |
-| PUT    | /pacientes/{id}      | Actualizar paciente      |
-| DELETE | /pacientes/{id}      | Eliminar paciente        |
-
-
-##  Integración con Microservicio de Autenticación
-
-El microservicio está preparado para integrarse con el servicio de autenticación mediante llamadas REST.
-
-Antes de ejecutar operaciones, se valida el token a través del endpoint:
-
-GET /api/auth/validate?token=XXX
-
-
-Esto permite restringir el acceso solo a usuarios autenticados.
-
-## Validaciones implementadas
-
-Se utilizan anotaciones de Jakarta Validation para asegurar la integridad de los datos:
-
-- `@NotBlank` → campos obligatorios
-- `@Min` → validación de valores numéricos
-
-Ejemplo:
-
-```java
-@NotBlank(message = "El nombre es obligatorio")
-private String nombre;
-
-Manejo de errores
-
-Se implementa un manejador global de excepciones con:
-
-@RestControllerAdvice
-
-Permitiendo devolver respuestas claras como:
-
-{
-  "mensaje": "No autorizado"
-}
-
-Ejecución del proyecto
-- Compilar
-./mvnw clean install
-
-- Ejecutar
-./mvnw spring-boot:run
-
-Ejemplo de petición (POST)
+⚙️ Funcionalidades (CRUD)
+Método	Endpoint	Descripción
+GET	/pacientes	Listar pacientes
+GET	/pacientes/{id}	Obtener paciente por ID
+POST	/pacientes	Crear paciente
+PUT	/pacientes/{id}	Actualizar paciente
+DELETE	/pacientes/{id}	Eliminar paciente
+🔄 Ejemplo de petición (POST)
 {
   "nombre": "Carlos",
   "edad": 25,
   "diagnostico": "Resfrío"
 }
+🔐 Integración con Microservicio de Autenticación
 
-Patrones de diseño utilizados
-Repository Pattern → acceso a datos
-Arquitectura en capas → separación de responsabilidades
-(Preparado) Factory Method → para creación de entidades
+El microservicio está preparado para validar tokens mediante un servicio externo de autenticación.
 
+Se utiliza una URL configurable:
 
+auth.url=http://localhost:8080/api/auth/validate
+⚡ Patrón Circuit Breaker
+
+Se implementa el patrón Circuit Breaker utilizando Resilience4j para evitar fallas del sistema cuando el microservicio de autenticación no está disponible.
+
+✔ Permite continuidad del servicio
+✔ Evita caídas del sistema
+✔ Implementa método fallback
+
+🐳 Dockerización
+
+El microservicio está preparado para ejecutarse en contenedores Docker.
+
+📄 docker-compose.yml
+services:
+  pacientes-service:
+    build: .
+    container_name: pacientes-service
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+▶️ Ejecución del proyecto
+🔹 Compilar
+mvn clean package
+🔹 Ejecutar con Docker
+docker-compose up --build
+🌐 Acceso a la API
+API:
+http://localhost:8082/pacientes
+Swagger UI:
+http://localhost:8082/swagger-ui.html
+🧪 Pruebas
+
+Se pueden realizar pruebas utilizando:
+
+Postman
+Navegador (GET)
+Swagger UI
+🎯 Patrones de diseño utilizados
+Repository Pattern
+Arquitectura en capas
+Circuit Breaker (Resilience4j)
+🏁 Conclusión
+
+El microservicio de pacientes cumple con los requerimientos de gestión de datos clínicos, implementando buenas prácticas de desarrollo como separación de responsabilidades, tolerancia a fallos y despliegue mediante contenedores Docker.
+
+👨‍💻 Autor
+
+Carlos Bernal
