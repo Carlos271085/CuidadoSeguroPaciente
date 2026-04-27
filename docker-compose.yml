@@ -1,0 +1,8 @@
+services:
+  pacientes-service:
+    build: .
+    container_name: pacientes-service
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker

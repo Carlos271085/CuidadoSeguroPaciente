@@ -19,53 +19,36 @@ public class PacienteController {
 
     // GET -> listar pacientes
     @GetMapping
-    public ResponseEntity<List<Paciente>> listar(
-            @RequestParam String token){
-
-        return ResponseEntity.ok(service.obtenerTodos(token));
+    public ResponseEntity<List<Paciente>> listar() {
+        return ResponseEntity.ok(service.obtenerTodos(null));
     }
 
-    //Get por ID
+    // GET por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Paciente> obtenerPorID(
-            @PathVariable Long id,
-            @RequestParam String token){
-
+    public ResponseEntity<Paciente> obtenerPorID(@PathVariable Long id) {
         return ResponseEntity.ok(service.obtenerPorId(id));
-
-        }
+    }
 
     // POST -> guardar paciente
     @PostMapping
-    public ResponseEntity<Paciente> guardar(
-        @RequestParam String token,
-        @RequestBody Paciente paciente){
-
-        return ResponseEntity.ok(service.guardar(token,paciente));
-
-    
+    public ResponseEntity<Paciente> guardar(@RequestBody Paciente paciente) {
+        return ResponseEntity.ok(service.guardar(null, paciente));
     }
 
-    //Put
+    // PUT
     @PutMapping("/{id}")
     public ResponseEntity<Paciente> actualizar(
-        @PathVariable Long id,
-        @RequestParam String token,
-        @Valid @RequestBody Paciente paciente){
+            @PathVariable Long id,
+            @Valid @RequestBody Paciente paciente) {
 
-    return ResponseEntity.ok(service.actualizar(id, paciente));
-}
+        return ResponseEntity.ok(service.actualizar(id, paciente));
+    }
 
-    //Eliminar
+    // DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminar(
-        @PathVariable Long id,
-        @RequestParam String token){
+    public ResponseEntity<String> eliminar(@PathVariable Long id) {
 
-    service.eliminar(id);
-    return ResponseEntity.ok("Paciente eliminado");
-}
-
-    
-    
+        service.eliminar(id);
+        return ResponseEntity.ok("Paciente eliminado");
+    }
 }

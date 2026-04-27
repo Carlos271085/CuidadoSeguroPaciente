@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Archivo de configuración de Maven para el proyecto -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <!-- Versión del modelo de Maven -->
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Configuración base de Spring Boot -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -12,40 +16,49 @@
         <relativePath/>
     </parent>
 
+    <!-- Identificación del proyecto -->
     <groupId>com.pacientes</groupId>
     <artifactId>pacientes</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>pacientes</name>
     <description>Microservicio de pacientes</description>
 
+    <!-- Propiedades generales del proyecto -->
     <properties>
+        <!-- Versión de Java utilizada -->
         <java.version>17</java.version>
     </properties>
 
+    <!-- Dependencias del proyecto -->
     <dependencies>
 
+        <!-- Permite crear APIs REST (controladores, edpoints, etc..) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- Permite trabajar con base de datos usando JPA (Hibernate) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
+        <!-- Base de datos en memoria (ideal para pruebas y desarrollo) -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Reduce código repetitivo (getters, setters, constructores, etc..) -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
 
+        <!-- Herramientas para desarrollo (recarga automática de cambios) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -53,22 +66,34 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Librerías para Testing (JUnit, Mockito, etc.) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
+        <!-- Genera documentación automática de la API (Swagger / OpenAPI) -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.5.0</version>
         </dependency>
 
+        <!-- Implementación del patrón Circuit Breaker con Resilience4j -->
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot3</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+
     </dependencies>
 
+    <!-- Configuración de construcción del proyecto -->
     <build>
         <plugins>
+
+            <!-- Plugin para empaquetar la aplicación como archivo .jar ejecutable -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
