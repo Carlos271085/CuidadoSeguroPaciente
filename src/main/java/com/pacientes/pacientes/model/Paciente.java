@@ -17,9 +17,19 @@ public class Paciente {
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 
+    @NotBlank(message = "El apellido es obligatorio")
+    private String apellido;
+
+    @NotBlank(message = "El rut es obligatorio")
+    private String rut;
+
     @Min(value = 0, message = "La edad no puede ser negativa")
     private int edad;
 
     @NotBlank(message = "El diagnóstico es obligatorio")
     private String diagnostico;
+
+    private String alergias;
+
+    private String observaciones;
 }
