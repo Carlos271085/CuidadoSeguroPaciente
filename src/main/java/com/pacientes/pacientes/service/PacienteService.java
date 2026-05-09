@@ -4,10 +4,9 @@ package com.pacientes.pacientes.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.client.HttpClientErrorException;
 // Importaciones para consumir APIs externas
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.ResponseEntity;
 
 // Importa modelo y repositorio
 import com.pacientes.pacientes.model.Paciente;
@@ -16,6 +15,7 @@ import com.pacientes.pacientes.repository.PacienteRepository;
 // Importa Circuit Breaker
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
+import org.springframework.http.*;
 // Importaciones Java
 import java.util.List;
 import java.util.Map;
@@ -31,6 +31,7 @@ public class PacienteService {
     // Permite consumir otros microservicios
     private final RestTemplate restTemplate = new RestTemplate();
 
+    
     // Obtiene la URL del microservicio auth desde application.properties
     @Value("${auth.url}")
     private String AUTH_URL;
@@ -41,33 +42,40 @@ public class PacienteService {
     @CircuitBreaker(name = "authService", fallbackMethod = "fallbackToken")
     public boolean validarToken(String token) {
 
+        
+        //System.out.println("Validando token: " + token + " en auth: " + url);
+
         try {
 
-            // Construye la URL con el token
-            String url = AUTH_URL + "?token=" + token;
+            HttpHeaders headers = new HttpHeaders();
 
-            // Realiza petición GET al microservicio auth
-            ResponseEntity<Map> response =
-                    restTemplate.getForEntity(url, Map.class);
+            if (token != null && !token.isBlank()) {
+                headers.setBearerAuth(token);
+            }
 
-            // Obtiene el body de la respuesta
-            Map body = response.getBody();
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-            // Si la respuesta es nula retorna false
-            if (body == null) return false;
+            String url = AUTH_URL;
 
-            // Obtiene el valor booleano "data"
-            Boolean valido = (Boolean) body.get("data");
 
-            // Retorna true si el token es válido
-            return Boolean.TRUE.equals(valido);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    String.class
+            );
+
+            return response.getStatusCode() == HttpStatus.OK;
+
+        } catch (HttpClientErrorException e) {
+
+            System.out.println("Token no válido -> acceso denegado");
+            return false;
 
         } catch (Exception e) {
 
-            // Mensaje de error si auth no responde
-            System.out.println("Error al conectar con auth → usando fallback");
-
-            return true;
+            System.out.println("Error validando token: " + e.getMessage());
+            return false;
         }
     }
 
@@ -76,7 +84,7 @@ public class PacienteService {
     
     public boolean fallbackToken(String token, Throwable t) {
 
-        System.out.println("Auth no disponible → Circuit Breaker activado");
+        //System.out.println("Auth no disponible -> Circuit Breaker activado");
 
         // Permite continuar aunque auth esté caído
         return true;
@@ -86,7 +94,8 @@ public class PacienteService {
     // GET TODOS LOS PACIENTES
     
     public List<Paciente> obtenerTodos(String token) {
-
+        //System.out.println("Token: "+token);
+        
         // Valida token antes de obtener datos
         if (!validarToken(token)) {
             throw new RuntimeException("No autorizado");
@@ -99,7 +108,10 @@ public class PacienteService {
     
     // GET PACIENTE POR ID
     
-    public Paciente obtenerPorId(Long id) {
+    public Paciente obtenerPorId(Long id,String token) {
+        if (!validarToken(token)) {
+            throw new RuntimeException("No autorizado");
+        }
 
         // Busca paciente por ID
         return repository.findById(id)
@@ -123,8 +135,11 @@ public class PacienteService {
     
     // PUT ACTUALIZAR PACIENTE
     
-    public Paciente actualizar(Long id, Paciente paciente) {
+    public Paciente actualizar(Long id, Paciente paciente,String token) {
 
+        if (!validarToken(token)) {
+            throw new RuntimeException("No autorizado");
+        }
         // Busca paciente existente
         Paciente existente = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
@@ -184,8 +199,11 @@ public class PacienteService {
     
     // DELETE ELIMINAR PACIENTE
     
-    public void eliminar(Long id) {
+    public void eliminar(Long id, String token) {
 
+        if (!validarToken(token)) {
+            throw new RuntimeException("No autorizado");
+        }
         // Verifica si el paciente existe
         if (!repository.existsById(id)) {
             throw new RuntimeException("Paciente no encontrado");

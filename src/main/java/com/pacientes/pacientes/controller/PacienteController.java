@@ -40,22 +40,20 @@ public class PacienteController {
     // GET -> LISTAR TODOS LOS PACIENTES
     
     @Operation(summary = "Obtener todos los pacientes")
-
     @GetMapping
-    public ResponseEntity<List<Paciente>> listar() {
+    public ResponseEntity<List<Paciente>> listar(@RequestHeader("Authorization") String token) {
 
-        return ResponseEntity.ok(service.obtenerTodos(null));
+        return ResponseEntity.ok(service.obtenerTodos(token));
     }
 
     
     // GET -> OBTENER PACIENTE POR ID
     
     @Operation(summary = "Obtener paciente por ID")
-
     @GetMapping("/{id}")
-    public ResponseEntity<Paciente> obtenerPorID(@PathVariable Long id) {
+    public ResponseEntity<Paciente> obtenerPorID(@PathVariable Long id,@RequestHeader("Authorization") String token) {
 
-        return ResponseEntity.ok(service.obtenerPorId(id));
+        return ResponseEntity.ok(service.obtenerPorId(id,token));
     }
 
     
@@ -77,9 +75,10 @@ public class PacienteController {
     @PutMapping("/{id}")
     public ResponseEntity<Paciente> actualizar(
             @PathVariable Long id,
-            @Valid @RequestBody Paciente paciente) {
+            @Valid @RequestBody Paciente paciente,
+            @RequestHeader("Authorization") String token) {
 
-        return ResponseEntity.ok(service.actualizar(id, paciente));
+        return ResponseEntity.ok(service.actualizar(id, paciente, token));
     }
 
     
@@ -88,9 +87,9 @@ public class PacienteController {
     @Operation(summary = "Eliminar un paciente")
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminar(@PathVariable Long id) {
+    public ResponseEntity<String> eliminar(@PathVariable Long id, @RequestHeader("Authorization") String token) {
 
-        service.eliminar(id);
+        service.eliminar(id, token);
 
         return ResponseEntity.ok("Paciente eliminado");
     }
