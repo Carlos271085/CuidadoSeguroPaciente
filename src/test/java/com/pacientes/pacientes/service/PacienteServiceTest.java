@@ -92,7 +92,7 @@ public class PacienteServiceTest {
 
         // ACT
 
-        Paciente resultado = service.obtenerPorId(1L, null);
+        Paciente resultado = service.obtenerPorId( null,1L);
 
         // ASSERT
 
@@ -140,7 +140,7 @@ public class PacienteServiceTest {
 
         // ACT
 
-        service.eliminar(1L, null);
+        service.eliminar( null,1L);
 
         // ASSERT
 
