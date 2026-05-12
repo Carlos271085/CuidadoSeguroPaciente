@@ -53,7 +53,7 @@ public class PacienteController {
     @GetMapping("/{id}")
     public ResponseEntity<Paciente> obtenerPorID(@PathVariable Long id,@RequestHeader("Authorization") String token) {
 
-        return ResponseEntity.ok(service.obtenerPorId(id,token));
+        return ResponseEntity.ok(service.obtenerPorId(token,id));
     }
 
     
@@ -78,9 +78,16 @@ public class PacienteController {
             @Valid @RequestBody Paciente paciente,
             @RequestHeader("Authorization") String token) {
 
-        return ResponseEntity.ok(service.actualizar(id, paciente, token));
+        return ResponseEntity.ok(service.actualizar(token,id, paciente));
     }
 
+    @GetMapping("/buscarRut")
+    public ResponseEntity<List<Paciente>> buscarPorRut(
+            @RequestHeader("Authorization") String token,
+            @RequestParam String rut
+            ) {
+        return ResponseEntity.ok(service.buscarPorRut(token, rut));
+    }
     
     // DELETE -> ELIMINAR PACIENTE
     
@@ -89,7 +96,7 @@ public class PacienteController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> eliminar(@PathVariable Long id, @RequestHeader("Authorization") String token) {
 
-        service.eliminar(id, token);
+        service.eliminar(token,id);
 
         return ResponseEntity.ok("Paciente eliminado");
     }

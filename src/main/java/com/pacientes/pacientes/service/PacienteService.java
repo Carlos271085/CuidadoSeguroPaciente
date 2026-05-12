@@ -19,6 +19,7 @@ import org.springframework.http.*;
 // Importaciones Java
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 // Marca esta clase como un servicio
 @Service
@@ -108,7 +109,7 @@ public class PacienteService {
     
     // GET PACIENTE POR ID
     
-    public Paciente obtenerPorId(Long id,String token) {
+    public Paciente obtenerPorId(String token,Long id) {
         if (!validarToken(token)) {
             throw new RuntimeException("No autorizado");
         }
@@ -135,7 +136,7 @@ public class PacienteService {
     
     // PUT ACTUALIZAR PACIENTE
     
-    public Paciente actualizar(Long id, Paciente paciente,String token) {
+    public Paciente actualizar(String token,Long id, Paciente paciente) {
 
         if (!validarToken(token)) {
             throw new RuntimeException("No autorizado");
@@ -196,10 +197,17 @@ public class PacienteService {
         return repository.save(existente);
     }
 
+    //Buscar pacientes por rut
+    public List<Paciente> buscarPorRut(String token, String rut) {
+        if (!validarToken(token)) {
+            throw new RuntimeException("No autorizado");
+        }
+        return repository.findByRut(rut);
+    }
     
     // DELETE ELIMINAR PACIENTE
     
-    public void eliminar(Long id, String token) {
+    public void eliminar(String token, Long id) {
 
         if (!validarToken(token)) {
             throw new RuntimeException("No autorizado");
