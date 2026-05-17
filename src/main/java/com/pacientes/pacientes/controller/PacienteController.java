@@ -20,10 +20,7 @@ import java.util.List;
 import jakarta.validation.Valid;
 
 // Personaliza el nombre del controlador en Swagger
-@Tag(
-    name = "Gestión de Pacientes",
-    description = "Endpoints para administrar pacientes del sistema"
-)
+@Tag(name = "Gestión de Pacientes", description = "Endpoints para administrar pacientes del sistema")
 
 // Marca esta clase como controlador REST
 @RestController
@@ -36,9 +33,8 @@ public class PacienteController {
     @Autowired
     private PacienteService service;
 
-    
     // GET -> LISTAR TODOS LOS PACIENTES
-    
+
     @Operation(summary = "Obtener todos los pacientes")
     @GetMapping
     public ResponseEntity<List<Paciente>> listar(@RequestHeader("Authorization") String token) {
@@ -46,30 +42,29 @@ public class PacienteController {
         return ResponseEntity.ok(service.obtenerTodos(token));
     }
 
-    
     // GET -> OBTENER PACIENTE POR ID
-    
+
     @Operation(summary = "Obtener paciente por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<Paciente> obtenerPorID(@PathVariable Long id,@RequestHeader("Authorization") String token) {
+    public ResponseEntity<Paciente> obtenerPorID(@PathVariable Long id, @RequestHeader("Authorization") String token) {
 
-        return ResponseEntity.ok(service.obtenerPorId(token,id));
+        return ResponseEntity.ok(service.obtenerPorId(token, id));
     }
 
-    
     // POST -> REGISTRAR PACIENTE
-    
+
     @Operation(summary = "Registrar un nuevo paciente")
 
     @PostMapping
-    public ResponseEntity<Paciente> guardar(@RequestBody Paciente paciente) {
+public ResponseEntity<Paciente> guardar(
+        @RequestBody Paciente paciente,
+        @RequestHeader("Authorization") String token) {
 
-        return ResponseEntity.ok(service.guardar(null, paciente));
-    }
+    return ResponseEntity.ok(service.guardar(token, paciente));
+}
 
-    
     // PUT -> ACTUALIZAR PACIENTE
-    
+
     @Operation(summary = "Actualizar información de un paciente")
 
     @PutMapping("/{id}")
@@ -78,25 +73,33 @@ public class PacienteController {
             @Valid @RequestBody Paciente paciente,
             @RequestHeader("Authorization") String token) {
 
-        return ResponseEntity.ok(service.actualizar(token,id, paciente));
+        return ResponseEntity.ok(service.actualizar(token, id, paciente));
     }
 
     @GetMapping("/buscarRut")
-    public ResponseEntity<List<Paciente>> buscarPorRut(
+    public ResponseEntity<Paciente> buscarPorRut(
             @RequestHeader("Authorization") String token,
-            @RequestParam String rut
-            ) {
+            @RequestParam String rut) {
         return ResponseEntity.ok(service.buscarPorRut(token, rut));
     }
-    
+
+    @Operation(summary = "Buscar paciente por RUT")
+    @GetMapping("/rut/{rut}")
+    public ResponseEntity<Paciente> obtenerPorRut(
+            @PathVariable String rut,
+            @RequestHeader("Authorization") String token) {
+
+        return ResponseEntity.ok(service.buscarPorRut(token, rut));
+    }
+
     // DELETE -> ELIMINAR PACIENTE
-    
+
     @Operation(summary = "Eliminar un paciente")
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> eliminar(@PathVariable Long id, @RequestHeader("Authorization") String token) {
 
-        service.eliminar(token,id);
+        service.eliminar(token, id);
 
         return ResponseEntity.ok("Paciente eliminado");
     }
