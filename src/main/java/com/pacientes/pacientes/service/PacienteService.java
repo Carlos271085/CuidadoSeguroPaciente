@@ -32,39 +32,42 @@ public class PacienteService {
     // Permite consumir otros microservicios
     private final RestTemplate restTemplate = new RestTemplate();
 
-    
     // Obtiene la URL del microservicio auth desde application.properties
     @Value("${auth.url}")
     private String AUTH_URL;
 
-    
     // VALIDAR TOKEN CON CIRCUIT BREAKER
-    
+
     @CircuitBreaker(name = "authService", fallbackMethod = "fallbackToken")
     public boolean validarToken(String token) {
 
-        
-        //System.out.println("Validando token: " + token + " en auth: " + url);
+        // System.out.println("Validando token: " + token + " en auth: " + url);
+        System.out.println("TOKEN RECIBIDO:");
+        System.out.println(token);
 
         try {
 
             HttpHeaders headers = new HttpHeaders();
 
             if (token != null && !token.isBlank()) {
-                headers.setBearerAuth(token);
+                headers.set("Authorization", token);
             }
 
             HttpEntity<Void> entity = new HttpEntity<>(headers);
 
             String url = AUTH_URL;
 
+            System.out.println("HEADER AUTHORIZATION:");
+            System.out.println(headers);
+            System.out.println("URL AUTH:");
+            System.out.println(url);
 
+            
             ResponseEntity<String> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     entity,
-                    String.class
-            );
+                    String.class);
 
             return response.getStatusCode() == HttpStatus.OK;
 
@@ -80,23 +83,21 @@ public class PacienteService {
         }
     }
 
-    
     // FALLBACK CUANDO AUTH FALLA
-    
+
     public boolean fallbackToken(String token, Throwable t) {
 
-        //System.out.println("Auth no disponible -> Circuit Breaker activado");
+        // System.out.println("Auth no disponible -> Circuit Breaker activado");
 
         // Permite continuar aunque auth esté caído
         return true;
     }
 
-    
     // GET TODOS LOS PACIENTES
-    
+
     public List<Paciente> obtenerTodos(String token) {
-        //System.out.println("Token: "+token);
-        
+        // System.out.println("Token: "+token);
+
         // Valida token antes de obtener datos
         if (!validarToken(token)) {
             throw new RuntimeException("No autorizado");
@@ -106,10 +107,9 @@ public class PacienteService {
         return repository.findAll();
     }
 
-    
     // GET PACIENTE POR ID
-    
-    public Paciente obtenerPorId(String token,Long id) {
+
+    public Paciente obtenerPorId(String token, Long id) {
         if (!validarToken(token)) {
             throw new RuntimeException("No autorizado");
         }
@@ -119,9 +119,8 @@ public class PacienteService {
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
     }
 
-    
     // POST GUARDAR PACIENTE
-    
+
     public Paciente guardar(String token, Paciente paciente) {
 
         // Valida token antes de guardar
@@ -133,10 +132,9 @@ public class PacienteService {
         return repository.save(paciente);
     }
 
-    
     // PUT ACTUALIZAR PACIENTE
-    
-    public Paciente actualizar(String token,Long id, Paciente paciente) {
+
+    public Paciente actualizar(String token, Long id, Paciente paciente) {
 
         if (!validarToken(token)) {
             throw new RuntimeException("No autorizado");
@@ -197,16 +195,17 @@ public class PacienteService {
         return repository.save(existente);
     }
 
-    //Buscar pacientes por rut
-    public List<Paciente> buscarPorRut(String token, String rut) {
-        if (!validarToken(token)) {
-            throw new RuntimeException("No autorizado");
-        }
-        return repository.findByRut(rut);
+    // Buscar pacientes por rut
+    public Paciente buscarPorRut(String token, String rut) {
+
+        System.out.println("RUT RECIBIDO: [" + rut + "]");
+
+        return repository.findByRutNormalizado(rut)
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
     }
-    
+
     // DELETE ELIMINAR PACIENTE
-    
+
     public void eliminar(String token, Long id) {
 
         if (!validarToken(token)) {

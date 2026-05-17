@@ -14,6 +14,7 @@ import lombok.*;
 
 // Marca esta clase como una entidad de la base de datos
 @Entity
+@Table(name = "paciente")
 
 // Genera automáticamente getters, setters, toString, equals y hashCode
 @Data
