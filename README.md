@@ -255,11 +255,22 @@ services:
 
 ```json
 {
+  "rut": "20.123.456-7",
   "nombre": "Carlos",
   "apellido": "Bernal",
-  "edad": 21,
+  "fechaNacimiento": "2004-05-10",
+  "genero": "Masculino",
   "diagnostico": "Hipertensión",
-  "alergias": "Penicilina"
+  "alergias": "Penicilina",
+  "observaciones": "Paciente estable",
+  "direccion": "Villa Alemana",
+  "ciudad": "Valparaíso",
+  "telefono": "+56912345678",
+  "email": "carlos@email.com",
+  "controlMedico": "Mensual",
+  "tutorResponsable": "María Bernal",
+  "parentescoTutor": "Madre",
+  "imagenUrl": "https://imagen.com/paciente.jpg"
 }
 ```
 
@@ -270,11 +281,22 @@ services:
 ```json
 {
   "id": 1,
+  "rut": "20.123.456-7",
   "nombre": "Carlos",
   "apellido": "Bernal",
-  "edad": 21,
+  "fechaNacimiento": "2004-05-10",
+  "genero": "Masculino",
   "diagnostico": "Hipertensión",
-  "alergias": "Penicilina"
+  "alergias": "Penicilina",
+  "observaciones": "Paciente estable",
+  "direccion": "Villa Alemana",
+  "ciudad": "Valparaíso",
+  "telefono": "+56912345678",
+  "email": "carlos@email.com",
+  "controlMedico": "Mensual",
+  "tutorResponsable": "María Bernal",
+  "parentescoTutor": "Madre",
+  "imagenUrl": "https://imagen.com/paciente.jpg"
 }
 ```
 
