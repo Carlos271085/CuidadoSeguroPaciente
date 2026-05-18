@@ -62,7 +62,6 @@ public class PacienteService {
             System.out.println("URL AUTH:");
             System.out.println(url);
 
-            
             ResponseEntity<String> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
@@ -198,10 +197,23 @@ public class PacienteService {
     // Buscar pacientes por rut
     public Paciente buscarPorRut(String token, String rut) {
 
+        // Validar token
+        if (!validarToken(token)) {
+            throw new RuntimeException("No autorizado");
+        }
+
         System.out.println("RUT RECIBIDO: [" + rut + "]");
 
-        return repository.findByRutNormalizado(rut)
-                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+        String rutNormalizado = rut
+            .replace(".", "")
+            .replace("-", "")
+            .trim();
+
+        System.out.println("RUT NORMALIZADO: [" + rutNormalizado + "]");
+
+        return repository.findByRutNormalizado(rutNormalizado)
+            .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+            
     }
 
     // DELETE ELIMINAR PACIENTE
