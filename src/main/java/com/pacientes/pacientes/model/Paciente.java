@@ -16,6 +16,9 @@ import lombok.*;
 @Entity
 @Table(name = "paciente")
 
+// Se genera la tabla pacientes
+@Table(name = "pacientes")
+
 // Genera automáticamente getters, setters, toString, equals y hashCode
 @Data
 
