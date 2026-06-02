@@ -10,13 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-<<<<<<< HEAD
 @Table(name = "pacientes")
-=======
-@Table(name = "paciente")
-
->>>>>>> ef17ebc8ce54e5f4996d473841d6d48a6e1ad170
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
