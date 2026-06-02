@@ -1,9 +1,9 @@
 package com.pacientes.pacientes.service;
 
-// Importaciones JUnit
+// Importaciones para las aserciones de JUnit
 import static org.junit.jupiter.api.Assertions.*;
-
-// Importaciones Mockito
+import static org.mockito.ArgumentMatchers.any;
+// Importaciones para Mockito
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
@@ -19,36 +19,56 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
-// Importa modelo y repositorio
+// Modelo y repositorio
 import com.pacientes.pacientes.model.Paciente;
 import com.pacientes.pacientes.repository.PacienteRepository;
 
 public class PacienteServiceTest {
 
-    // Simula el repositorio
+    /*
+     * Simula el comportamiento del repositorio.
+     * No se accede a una base de datos real.
+     */
     @Mock
     private PacienteRepository repository;
 
-    // Inyecta el mock dentro del service
+    /*
+     * Crea una instancia real de PacienteService,
+     * pero permite modificar el comportamiento de algunos métodos.
+     */
+    @Spy
     @InjectMocks
     private PacienteService service;
 
-    // Inicializa Mockito antes de cada test
+    /*
+     * Método que se ejecuta antes de cada prueba.
+     * Inicializa los mocks de Mockito.
+     */
     @BeforeEach
     void setUp() {
 
         MockitoAnnotations.openMocks(this);
+
+        /*
+         * Simula que la validación del token siempre es correcta.
+         * Evita depender del microservicio Auth durante los tests.
+         */
+        doReturn(true)
+                .when(service)
+                .validarToken(any());
     }
 
-    
-    // TEST -> OBTENER TODOS LOS PACIENTES
-    
+    /*
+     * Verifica que el servicio pueda obtener todos los pacientes.
+     */
     @Test
     void deberiaObtenerTodosLosPacientes() {
 
         // ARRANGE
 
+        // Crear paciente de prueba
         Paciente paciente = new Paciente();
 
         paciente.setId(1L);
@@ -59,23 +79,30 @@ public class PacienteServiceTest {
         paciente.setGenero("Masculino");
         paciente.setDiagnostico("Hipertensión");
 
-        // Simula respuesta del repositorio
+        /*
+         * Simula que el repositorio devuelve una lista
+         * con un único paciente.
+         */
         when(repository.findAll())
                 .thenReturn(Arrays.asList(paciente));
 
         // ACT
 
-        List<Paciente> resultado = service.obtenerTodos(null);
+        // Ejecuta el método a probar
+        List<Paciente> resultado = service.obtenerTodos("token");
 
         // ASSERT
 
+        // Verifica que exista un paciente
         assertEquals(1, resultado.size());
+
+        // Verifica el nombre del paciente
         assertEquals("Juan", resultado.get(0).getNombre());
     }
 
-    
-    // TEST -> OBTENER PACIENTE POR ID
-    
+    /*
+     * Verifica que el servicio obtenga un paciente por ID.
+     */
     @Test
     void deberiaObtenerPacientePorId() {
 
@@ -86,23 +113,30 @@ public class PacienteServiceTest {
         paciente.setId(1L);
         paciente.setNombre("María");
 
-        // Simula búsqueda por ID
+        /*
+         * Simula que el repositorio encuentra
+         * el paciente solicitado.
+         */
         when(repository.findById(1L))
                 .thenReturn(Optional.of(paciente));
 
         // ACT
 
-        Paciente resultado = service.obtenerPorId( null,1L);
+        Paciente resultado = service.obtenerPorId("token", 1L);
 
         // ASSERT
 
+        // Verifica que el objeto no sea nulo
         assertNotNull(resultado);
+
+        // Verifica el nombre esperado
         assertEquals("María", resultado.getNombre());
     }
 
-    
-    // TEST -> GUARDAR PACIENTE
-    
+    /*
+     * Verifica que el servicio guarde correctamente
+     * un nuevo paciente.
+     */
     @Test
     void deberiaGuardarPaciente() {
 
@@ -112,39 +146,144 @@ public class PacienteServiceTest {
 
         paciente.setNombre("Carlos");
 
-        // Simula guardado en BD
+        /*
+         * Simula el guardado exitoso
+         * en la base de datos.
+         */
         when(repository.save(paciente))
                 .thenReturn(paciente);
 
         // ACT
 
-        Paciente resultado = service.guardar(null, paciente);
+        Paciente resultado = service.guardar("token", paciente);
 
         // ASSERT
 
+        // Verifica que se haya retornado un objeto
         assertNotNull(resultado);
+
+        // Verifica el nombre almacenado
         assertEquals("Carlos", resultado.getNombre());
     }
 
-    
-    // TEST -> ELIMINAR PACIENTE
-    
+    /*
+     * Verifica que el servicio elimine correctamente
+     * un paciente existente.
+     */
     @Test
     void deberiaEliminarPaciente() {
 
         // ARRANGE
 
-        // Simula existencia del paciente
+        /*
+         * Simula que el paciente existe
+         * en la base de datos.
+         */
         when(repository.existsById(1L))
                 .thenReturn(true);
 
         // ACT
 
-        service.eliminar( null,1L);
+        service.eliminar("token", 1L);
 
         // ASSERT
 
+        /*
+         * Verifica que deleteById()
+         * fue ejecutado exactamente una vez.
+         */
         verify(repository, times(1))
                 .deleteById(1L);
     }
+    
+    /*
+ * Verifica que se lance una excepción
+ * cuando el paciente no existe.
+ */
+@Test
+void deberiaLanzarExcepcionCuandoPacienteNoExiste() {
+
+    when(repository.findById(1L))
+            .thenReturn(Optional.empty());
+
+    assertThrows(
+            RuntimeException.class,
+            () -> service.obtenerPorId("token", 1L)
+    );
+}
+
+/*
+ * Verifica que se rechace un token inválido.
+ */
+@Test
+void deberiaRechazarTokenInvalido() {
+
+    doReturn(false)
+            .when(service)
+            .validarToken(any());
+
+    assertThrows(
+            RuntimeException.class,
+            () -> service.obtenerTodos("token_invalido")
+    );
+}
+
+/*
+ * Verifica que no se pueda eliminar
+ * un paciente inexistente.
+ */
+@Test
+void noDeberiaEliminarPacienteInexistente() {
+
+    when(repository.existsById(1L))
+            .thenReturn(false);
+
+    assertThrows(
+            RuntimeException.class,
+            () -> service.eliminar("token", 1L)
+    );
+}
+
+@Test
+void deberiaActualizarPaciente() {
+
+    Paciente existente = new Paciente();
+    existente.setId(1L);
+    existente.setNombre("Juan");
+
+    Paciente actualizado = new Paciente();
+    actualizado.setNombre("Carlos");
+
+    when(repository.findById(1L))
+            .thenReturn(Optional.of(existente));
+
+    when(repository.save(any(Paciente.class)))
+            .thenReturn(existente);
+
+    Paciente resultado =
+            service.actualizar("token", 1L, actualizado);
+
+    assertNotNull(resultado);
+}
+
+@Test
+void deberiaBuscarPacientePorRut() {
+
+    Paciente paciente = new Paciente();
+
+    paciente.setRut("20.123.456-7");
+    paciente.setNombre("Juan");
+
+    when(repository.findByRutNormalizado("20.123.456-7"))
+            .thenReturn(Optional.of(paciente));
+
+    Paciente resultado =
+            service.buscarPorRut(
+                    "token",
+                    "20.123.456-7");
+
+    assertNotNull(resultado);
+    assertEquals("Juan", resultado.getNombre());
+}
+
 }
