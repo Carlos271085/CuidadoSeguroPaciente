@@ -10,6 +10,8 @@ import com.pacientes.pacientes.model.Paciente;
 
 public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
+    Optional<Paciente> findByRut(String rut);
+    
     // Buscar paciente por RUT normalizado
     @Query("SELECT p FROM Paciente p WHERE REPLACE(REPLACE(p.rut, '.', ''), '-', '') = :rut")
     Optional<Paciente> findByRutNormalizado(@Param("rut") String rut);

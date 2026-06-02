@@ -202,7 +202,7 @@ public class PacienteService {
 
         System.out.println("RUT RECIBIDO: [" + rut + "]");
 
-        return repository.findByRutNormalizado(rut)
+        return repository.findByRut(rut)
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
     }
 
