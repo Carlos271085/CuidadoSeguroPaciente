@@ -274,7 +274,7 @@ void deberiaBuscarPacientePorRut() {
     paciente.setRut("20.123.456-7");
     paciente.setNombre("Juan");
 
-    when(repository.findByRutNormalizado("20.123.456-7"))
+    when(repository.findByRut("20.123.456-7"))
             .thenReturn(Optional.of(paciente));
 
     Paciente resultado =
