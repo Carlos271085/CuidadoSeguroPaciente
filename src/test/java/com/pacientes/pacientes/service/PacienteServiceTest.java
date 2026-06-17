@@ -286,4 +286,106 @@ void deberiaBuscarPacientePorRut() {
     assertEquals("Juan", resultado.getNombre());
 }
 
+/* Actualizar() cuando el paciente no existe */
+@Test
+void deberiaLanzarExcepcionAlActualizarPacienteInexistente() {
+
+    Paciente paciente = new Paciente();
+
+    when(repository.findById(99L))
+            .thenReturn(Optional.empty());
+
+    assertThrows(
+            RuntimeException.class,
+            () -> service.actualizar(
+                    "token",
+                    99L,
+                    paciente
+            )
+    );
+}
+
+/* Actualizar() con Token inválido */
+@Test
+void noDeberiaActualizarConTokenInvalido() {
+
+    doReturn(false)
+            .when(service)
+            .validarToken(any());
+
+    Paciente paciente = new Paciente();
+
+    assertThrows(
+            RuntimeException.class,
+            () -> service.actualizar(
+                    "token",
+                    1L,
+                    paciente
+            )
+    );
+}
+
+/* ObtenerPorId() con Token inválido */
+@Test
+void noDeberiaObtenerPacientePorIdConTokenInvalido() {
+
+    doReturn(false)
+            .when(service)
+            .validarToken(any());
+
+    assertThrows(
+            RuntimeException.class,
+            () -> service.obtenerPorId(
+                    "token",
+                    1L
+            )
+    );
+}
+
+/*Eliminar() con Token inválido */
+@Test
+void noDeberiaEliminarConTokenInvalido() {
+
+    doReturn(false)
+            .when(service)
+            .validarToken(any());
+
+    assertThrows(
+            RuntimeException.class,
+            () -> service.eliminar(
+                    "token",
+                    1L
+            )
+    );
+}
+
+/*BuscarPorRut() cuando no existe */
+@Test
+void deberiaLanzarExcepcionSiRutNoExiste() {
+
+    when(repository.findByRut("11.111.111-1"))
+            .thenReturn(Optional.empty());
+
+    assertThrows(
+            RuntimeException.class,
+            () -> service.buscarPorRut(
+                    "token",
+                    "11.111.111-1"
+            )
+    );
+}
+
+/* FallbackToken() */
+@Test
+void deberiaRetornarTrueEnFallbackToken() {
+
+    boolean resultado =
+            service.fallbackToken(
+                    "token",
+                    new RuntimeException()
+            );
+
+    assertTrue(resultado);
+}
+
 }
